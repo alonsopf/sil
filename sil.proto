@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package sil;
+option go_package=".;sil";
+
+
+message GrpcRequest {
+    string input = 1;
+}
+
+message GrpcResponse {
+    string response = 1;
+}
+
+service GrpcService {
+  
+    rpc grpcService(GrpcRequest) returns (GrpcResponse) {};
+
+}
