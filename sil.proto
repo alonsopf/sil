@@ -42,23 +42,23 @@ message LoginRequest {
 
 message PeopleListRequest {
   string cookie = 1;
-  int32 idCampo = 2;
-  int32 status = 3;
-  int32 end = 4;
+  string idCampo = 2;
+  string status = 3;
+  string end = 4;
 }
 
 message PeopleListReply {
-	int32 idPersona = 1;
+	string idPersona = 1;
   	string apellido_paterno = 2;
   	string apellido_materno = 3;
   	string nombre = 4;
   	string curp = 5;
   	string ine = 6;
   	string acta_de_nacimiento = 7;
-  	int32 start = 8;
-  	int32 end = 9;
+  	string start = 8;
+  	string end = 9;
 	string alta_de_gobernacion = 10;
-  	int32 status = 11;
+  	string status = 11;
 }
 
 
