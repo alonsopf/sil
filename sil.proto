@@ -41,9 +41,10 @@ message LoginRequest {
 }
 
 message PeopleListRequest {
-  int32 idCampo = 1;
-  int32 status = 2;
-  int32 end = 3;
+  string cookie = 1;
+  int32 idCampo = 2;
+  int32 status = 3;
+  int32 end = 4;
 }
 
 message PeopleListReply {
