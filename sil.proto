@@ -27,6 +27,7 @@ service Greeter {
   rpc SayHello (HelloRequest) returns (HelloReply) {}
   rpc SayHelloAgain (HelloRequest) returns (HelloReply) {}
   rpc Login (LoginRequest) returns (LoginReply) {}
+  rpc PeopleList (PeopleListRequest) returns (stream PeopleListReply) {}
 }
 
 // The request message containing the user's name.
@@ -38,6 +39,28 @@ message LoginRequest {
   string email = 1;
   string pass = 2;
 }
+
+message PeopleListRequest {
+  int32 idCampo = 1;
+  int32 status = 2;
+  int32 end = 3;
+}
+
+message PeopleListReply {
+	int32 idPersona = 1;
+  	string apellido_paterno = 2;
+  	string apellido_materno = 3;
+  	string nombre = 4;
+  	string curp = 5;
+  	string ine = 6;
+  	string acta_de_nacimiento = 7;
+  	int32 start = 8;
+  	int32 end = 9;
+	string alta_de_gobernacion = 10;
+  	int32 status = 11;
+}
+
+
 
 message LoginReply {
   string message = 1;

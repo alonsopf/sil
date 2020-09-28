@@ -21,6 +21,7 @@ type GreeterClient interface {
 	SayHello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)
 	SayHelloAgain(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloReply, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
+	PeopleList(ctx context.Context, in *PeopleListRequest, opts ...grpc.CallOption) (Greeter_PeopleListClient, error)
 }
 
 type greeterClient struct {
@@ -58,6 +59,38 @@ func (c *greeterClient) Login(ctx context.Context, in *LoginRequest, opts ...grp
 	return out, nil
 }
 
+func (c *greeterClient) PeopleList(ctx context.Context, in *PeopleListRequest, opts ...grpc.CallOption) (Greeter_PeopleListClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Greeter_serviceDesc.Streams[0], "/sil.Greeter/PeopleList", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &greeterPeopleListClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Greeter_PeopleListClient interface {
+	Recv() (*PeopleListReply, error)
+	grpc.ClientStream
+}
+
+type greeterPeopleListClient struct {
+	grpc.ClientStream
+}
+
+func (x *greeterPeopleListClient) Recv() (*PeopleListReply, error) {
+	m := new(PeopleListReply)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // GreeterServer is the server API for Greeter service.
 // All implementations must embed UnimplementedGreeterServer
 // for forward compatibility
@@ -66,6 +99,7 @@ type GreeterServer interface {
 	SayHello(context.Context, *HelloRequest) (*HelloReply, error)
 	SayHelloAgain(context.Context, *HelloRequest) (*HelloReply, error)
 	Login(context.Context, *LoginRequest) (*LoginReply, error)
+	PeopleList(*PeopleListRequest, Greeter_PeopleListServer) error
 	mustEmbedUnimplementedGreeterServer()
 }
 
@@ -81,6 +115,9 @@ func (*UnimplementedGreeterServer) SayHelloAgain(context.Context, *HelloRequest)
 }
 func (*UnimplementedGreeterServer) Login(context.Context, *LoginRequest) (*LoginReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (*UnimplementedGreeterServer) PeopleList(*PeopleListRequest, Greeter_PeopleListServer) error {
+	return status.Errorf(codes.Unimplemented, "method PeopleList not implemented")
 }
 func (*UnimplementedGreeterServer) mustEmbedUnimplementedGreeterServer() {}
 
@@ -142,6 +179,27 @@ func _Greeter_Login_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Greeter_PeopleList_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(PeopleListRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GreeterServer).PeopleList(m, &greeterPeopleListServer{stream})
+}
+
+type Greeter_PeopleListServer interface {
+	Send(*PeopleListReply) error
+	grpc.ServerStream
+}
+
+type greeterPeopleListServer struct {
+	grpc.ServerStream
+}
+
+func (x *greeterPeopleListServer) Send(m *PeopleListReply) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 var _Greeter_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "sil.Greeter",
 	HandlerType: (*GreeterServer)(nil),
@@ -159,6 +217,12 @@ var _Greeter_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Greeter_Login_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "PeopleList",
+			Handler:       _Greeter_PeopleList_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "sil.proto",
 }
